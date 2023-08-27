@@ -23,26 +23,5 @@ interface ApiService {
     ): Case
 
 
-    companion object Factory {
-        fun create(): ApiService {
-            val gson = GsonBuilder()
-                .create()
 
-            val okHttpClient = OkHttpClient.Builder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(120, TimeUnit.SECONDS)
-                .build()
-
-
-            val retrofit: Retrofit = Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .client(okHttpClient)
-                .build()
-
-            return retrofit.create(ApiService::class.java)
-        }
-    }
 }

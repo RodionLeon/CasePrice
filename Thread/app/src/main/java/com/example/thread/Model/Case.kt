@@ -8,5 +8,6 @@ data class Case(
     val lowest_price: String,
     val median_price: String,
     val volume: String,
-    @PrimaryKey val name: String
+    @PrimaryKey
+    val name: String
 )
