@@ -45,12 +45,13 @@ class MainFragment : Fragment() {
         adapter = MainAdapter()
         rv.adapter = adapter
         rv.layoutManager = LinearLayoutManager(requireContext())
-        viewModel.getCases()
+
+        viewModel.getCasesFromApi()
         viewModel.date.observe(viewLifecycleOwner) { cases ->
                adapter.setCases(cases)
             }
         view.findViewById<Button>(R.id.getCase).setOnClickListener {
-            viewModel.getCases()
+            viewModel.getCasesFromApi()
         }
         return view
     }

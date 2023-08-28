@@ -5,9 +5,9 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "Cases")
 data class Case(
-    val lowest_price: String,
-    val median_price: String,
-    val volume: String,
+    var lowest_price: String,
+    var median_price: String,
+    var volume: String,
     @PrimaryKey
     val name: String
 )

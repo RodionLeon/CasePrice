@@ -12,7 +12,6 @@ import retrofit2.http.Query
 import java.util.concurrent.TimeUnit
 
 interface ApiService {
-
     @GET("market/priceoverview")
     suspend fun getCase(
         @Query("market_hash_name") caseName: String ,
@@ -21,7 +20,5 @@ interface ApiService {
         @Query("format") json: String = "json",
         @Query("key") key: String = "4FA72FC92EE7FE357FCB288BF60DB128"
     ): Case
-
-
-
+    
 }

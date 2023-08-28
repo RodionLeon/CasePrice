@@ -5,9 +5,9 @@ import com.example.thread.Model.Case
 import javax.inject.Inject
 
 class Repo @Inject constructor(
-    private val proviApiService: ApiService
+    private val provideApiService: ApiService
 ) {
     suspend fun getCase(caseName:String): Case{
-        return proviApiService.getCase(caseName)
+        return provideApiService.getCase(caseName)
     }
 }
