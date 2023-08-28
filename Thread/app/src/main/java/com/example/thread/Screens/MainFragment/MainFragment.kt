@@ -46,19 +46,22 @@ class MainFragment : Fragment() {
         rv.adapter = adapter
         rv.layoutManager = LinearLayoutManager(requireContext())
 
-        viewModel.getCasesFromApi()
+
         viewModel.date.observe(viewLifecycleOwner) { cases ->
-               adapter.setCases(cases)
-            }
+            adapter.setCases(cases)
+        }
+
+        viewModel.getAllCasesListFromDb().observe(viewLifecycleOwner) { cases ->
+            adapter.setCases(cases)
+        }
+
         view.findViewById<Button>(R.id.getCase).setOnClickListener {
             viewModel.getCasesFromApi()
         }
+
+
         return view
     }
-
-
-
-
 }
 
 

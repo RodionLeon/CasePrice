@@ -3,6 +3,7 @@ package com.example.thread.hilt.modules
 import android.content.Context
 import androidx.room.Room
 import com.example.thread.DateBase.CaseDB
+import com.example.thread.DateBase.CaseDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,5 +19,9 @@ object DatabaseModule {
     fun provideCaseDB(@ApplicationContext context: Context): CaseDB {
         return Room.databaseBuilder(context, CaseDB::class.java, "case_database")
             .build()
+    }
+    @Provides
+    fun provideCaseDao(caseDB: CaseDB): CaseDao {
+        return caseDB.caseDao()
     }
 }

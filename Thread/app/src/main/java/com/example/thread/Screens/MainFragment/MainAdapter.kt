@@ -32,19 +32,21 @@ class MainAdapter @Inject constructor() : RecyclerView.Adapter<MainAdapter.UserV
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val itemView = inflater.inflate(R.layout.item_rv, parent, false)
-        val holder = UserViewHolder(itemView)
-        return holder
+        return UserViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         val case = caseList[position]
+        val imageIndex = Consts.cases.indexOf(case.name)
 
-        holder.name.text = Consts.cases[position]
+        holder.name.text = case.name
         holder.buy.text = "buy:${case.lowest_price}"
         holder.count.text = "count:${case.volume}"
         holder.sell.text = "sell:${case.median_price}"
-        holder.img.setImageResource(Consts.casesImg[position])
 
+        if (imageIndex != -1 && imageIndex < Consts.casesImg.size) {
+            holder.img.setImageResource(Consts.casesImg[imageIndex])
+        }
     }
 
     override fun getItemCount(): Int {

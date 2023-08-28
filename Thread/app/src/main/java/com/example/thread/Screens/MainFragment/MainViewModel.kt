@@ -1,6 +1,7 @@
 package com.example.thread.Screens.MainFragment
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,8 +12,10 @@ import com.example.thread.Model.Case
 import com.example.thread.Repo.Repo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,26 +26,64 @@ class MainViewModel @Inject constructor(
     ViewModel() {
 
     val date: MutableLiveData<MutableList<Case>> = MutableLiveData()
-    fun getCasesFromApi() {
-        viewModelScope.launch {
-            val cases = mutableListOf<Case>()
-            for (caseName in Consts.cases) {
-                val caseFromApi = repo.getCase(caseName)
-                val existingCase = caseDB.caseDao().getCaseByName(caseName)
 
-                if (existingCase != null) {
-                    existingCase.lowest_price = caseFromApi.lowest_price
-                    existingCase.median_price = caseFromApi.median_price
-                    existingCase.volume = caseFromApi.volume
-                    caseDB.caseDao().updateCase(existingCase)
-                } else {
-                    caseDB.caseDao().insertCase(caseFromApi.copy(name = caseName))
-                }
-                cases.add(caseFromApi)
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            val casesFromDb = caseDB.caseDao().getAllCasesList()
+            date.postValue(casesFromDb.toMutableList())
+        }
+    }
+    init {
+        viewModelScope.launch {
+            if (caseDB.isDatabaseEmpty()) {
+                getCasesFromApi()
             }
-            date.postValue(cases)
         }
     }
 
+    fun getCasesFromApi() {
+        viewModelScope.launch {
+            val casesToUpdate = mutableListOf<Case>()
+            val casesToAdd = mutableListOf<Case>()
+            var delayMillis = 1000L
+
+            for ((index, caseName) in Consts.cases.withIndex()) {
+                while (true) {
+                    try {
+                        val caseFromApi = repo.getCase(caseName)
+                        Log.d("!!!", "getCasesFromApi: $caseFromApi ")
+                        val existingCase = caseDB.caseDao().getCaseByName(caseName)
+
+                        if (existingCase != null) {
+                            existingCase.lowest_price = caseFromApi.lowest_price
+                            existingCase.median_price = caseFromApi.median_price
+                            existingCase.volume = caseFromApi.volume
+                            casesToUpdate.add(existingCase)
+                        } else {
+                            casesToAdd.add(caseFromApi.copy(name = caseName))
+                        }
+                        break
+                    } catch (e: HttpException) {
+                        if (e.code() == 429) {
+                            delay(delayMillis)
+                            delayMillis *= 2
+                        } else {
+                            break
+                        }
+                    } catch (e: Exception) {
+                        break
+                    }
+                }
+                delayMillis = 1000L
+            }
+
+            caseDB.caseDao().updateCases(casesToUpdate)
+            caseDB.caseDao().insertCases(casesToAdd)
+        }
+    }
+
+    fun getAllCasesListFromDb(): LiveData<List<Case>> {
+        return repo.getAllCasesFromDb()
+    }
 
 }

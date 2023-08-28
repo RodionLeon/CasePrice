@@ -7,4 +7,8 @@ import com.example.thread.Model.Case
 @Database(entities = [Case::class], version = 1)
 abstract class CaseDB: RoomDatabase() {
     abstract fun caseDao(): CaseDao
+
+    suspend fun isDatabaseEmpty(): Boolean {
+        return caseDao().getRowCount() == 0
+    }
 }
