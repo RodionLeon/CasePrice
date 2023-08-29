@@ -13,7 +13,7 @@ import com.example.thread.R
 import javax.inject.Inject
 
 class MainAdapter @Inject constructor() : RecyclerView.Adapter<MainAdapter.UserViewHolder>() {
-   private var caseList = emptyList<Case>()
+    private var caseList = emptyList<Case>()
 
     inner class UserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val count = itemView.findViewById<TextView>(R.id.count)
@@ -21,6 +21,8 @@ class MainAdapter @Inject constructor() : RecyclerView.Adapter<MainAdapter.UserV
         val sell = itemView.findViewById<TextView>(R.id.sell)
         val name = itemView.findViewById<TextView>(R.id.name)
         val img = itemView.findViewById<ImageView>(R.id.imageView)
+        val difImgBuy = itemView.findViewById<ImageView>(R.id.buyImg)
+        val difImgSell = itemView.findViewById<ImageView>(R.id.sellImg)
     }
 
     fun setCases(cases: List<Case>) {
@@ -43,6 +45,12 @@ class MainAdapter @Inject constructor() : RecyclerView.Adapter<MainAdapter.UserV
         holder.buy.text = "buy:${case.lowest_price}"
         holder.count.text = "count:${case.volume}"
         holder.sell.text = "sell:${case.median_price}"
+        if (case.buyPriceComparison) holder.difImgBuy.setImageResource(R.drawable.baseline_arrow_upward_24) else holder.difImgBuy.setImageResource(
+            R.drawable.baseline_arrow_downward_24
+        )
+        if (case.sellPriceComparison) holder.difImgSell.setImageResource(R.drawable.baseline_arrow_upward_24) else holder.difImgSell.setImageResource(
+            R.drawable.baseline_arrow_downward_24
+        )
 
         if (imageIndex != -1 && imageIndex < Consts.casesImg.size) {
             holder.img.setImageResource(Consts.casesImg[imageIndex])

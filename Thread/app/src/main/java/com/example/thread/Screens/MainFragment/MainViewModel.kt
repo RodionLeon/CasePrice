@@ -1,11 +1,9 @@
 package com.example.thread.Screens.MainFragment
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.thread.Consts
 import com.example.thread.DateBase.CaseDB
 import com.example.thread.Model.Case
@@ -14,7 +12,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import javax.inject.Inject
 
@@ -46,18 +43,24 @@ class MainViewModel @Inject constructor(
             val casesToUpdate = mutableListOf<Case>()
             val casesToAdd = mutableListOf<Case>()
             var delayMillis = 1000L
-
             for ((index, caseName) in Consts.cases.withIndex()) {
                 while (true) {
                     try {
                         val caseFromApi = repo.getCase(caseName)
-                        Log.d("!!!", "getCasesFromApi: $caseFromApi ")
                         val existingCase = caseDB.caseDao().getCaseByName(caseName)
 
                         if (existingCase != null) {
+                            val sellPriceDifference = parsePrice(caseFromApi.median_price) - parsePrice(existingCase.median_price)
+                            val buyPriseDifference = parsePrice(caseFromApi.lowest_price) - parsePrice(existingCase.lowest_price)
+                            val sellPriceComparison = sellPriceDifference > 0
+                            val buyPriceComparison = buyPriseDifference > 0
                             existingCase.lowest_price = caseFromApi.lowest_price
                             existingCase.median_price = caseFromApi.median_price
                             existingCase.volume = caseFromApi.volume
+                            existingCase.buyPriceDifference = buyPriseDifference
+                            existingCase.sellPriceDifference = sellPriceDifference
+                            existingCase.buyPriceComparison = buyPriceComparison
+                            existingCase.sellPriceComparison = sellPriceComparison
                             casesToUpdate.add(existingCase)
                         } else {
                             casesToAdd.add(caseFromApi.copy(name = caseName))
@@ -79,11 +82,21 @@ class MainViewModel @Inject constructor(
 
             caseDB.caseDao().updateCases(casesToUpdate)
             caseDB.caseDao().insertCases(casesToAdd)
+
+            val updatedCases = date.value?.toMutableList() ?: mutableListOf()
+            updatedCases.addAll(casesToUpdate)
+            updatedCases.addAll(casesToAdd)
+            date.postValue(updatedCases)
         }
     }
 
     fun getAllCasesListFromDb(): LiveData<List<Case>> {
         return repo.getAllCasesFromDb()
+    }
+
+    private fun parsePrice(priceString: String): Double {
+        val priceWithoutDollarSign = priceString.removePrefix("$")
+        return priceWithoutDollarSign.toDoubleOrNull() ?: 0.0
     }
 
 }
