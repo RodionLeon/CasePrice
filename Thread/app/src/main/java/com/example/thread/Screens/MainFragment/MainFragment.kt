@@ -37,14 +37,23 @@ class MainFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-       val viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-
-        val view = inflater.inflate(R.layout.fragment_list, container,false)
+        val viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        val view = inflater.inflate(R.layout.fragment_list, container, false)
         rv = view.findViewById(R.id.rv)
 
         adapter = MainAdapter()
         rv.adapter = adapter
         rv.layoutManager = LinearLayoutManager(requireContext())
+
+
+        adapter.onItemLongClickListener = { position ->
+            val case = adapter.getCaseAtPosition(position)
+            if (case.isFavorite) {
+                viewModel.markAsNotFavorite(case.name)
+            } else {
+                viewModel.markAsFavorite(case.name)
+            }
+        }
 
 
         viewModel.date.observe(viewLifecycleOwner) { cases ->

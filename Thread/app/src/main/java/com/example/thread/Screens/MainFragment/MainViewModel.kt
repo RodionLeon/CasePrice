@@ -43,7 +43,7 @@ class MainViewModel @Inject constructor(
             val casesToUpdate = mutableListOf<Case>()
             val casesToAdd = mutableListOf<Case>()
             var delayMillis = 1000L
-            for ((index, caseName) in Consts.cases.withIndex()) {
+            for (caseName in Consts.cases) {
                 while (true) {
                     try {
                         val caseFromApi = repo.getCase(caseName)
@@ -92,6 +92,16 @@ class MainViewModel @Inject constructor(
 
     fun getAllCasesListFromDb(): LiveData<List<Case>> {
         return repo.getAllCasesFromDb()
+    }
+    fun markAsFavorite(caseName: String) {
+        viewModelScope.launch {
+            caseDB.caseDao().updateFavoriteStatus(caseName, true)
+        }
+    }
+    fun markAsNotFavorite(caseName: String) {
+        viewModelScope.launch {
+            caseDB.caseDao().updateFavoriteStatus(caseName, false)
+        }
     }
 
     private fun parsePrice(priceString: String): Double {

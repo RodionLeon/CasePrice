@@ -1,5 +1,6 @@
 package com.example.thread.Model
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -13,5 +14,6 @@ data class Case(
     var sellPriceComparison: Boolean = false,
     var buyPriceComparison: Boolean = false,
     @PrimaryKey
-    val name: String
+    val name: String,
+    var isFavorite: Boolean = false
 )
