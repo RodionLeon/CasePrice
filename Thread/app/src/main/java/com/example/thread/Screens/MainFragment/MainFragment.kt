@@ -10,6 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.thread.API.ApiService
@@ -28,16 +29,17 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainFragment : Fragment() {
-
+    private lateinit var viewModel: MainViewModel
     @Inject
     lateinit var adapter: MainAdapter
     private lateinit var rv: RecyclerView
+    private lateinit var binding: MainFragment
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         val view = inflater.inflate(R.layout.fragment_list, container, false)
         rv = view.findViewById(R.id.rv)
 
@@ -55,7 +57,6 @@ class MainFragment : Fragment() {
             }
         }
 
-
         viewModel.date.observe(viewLifecycleOwner) { cases ->
             adapter.setCases(cases)
         }
@@ -68,8 +69,12 @@ class MainFragment : Fragment() {
             viewModel.getCasesFromApi()
         }
 
-
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshData()
     }
 }
 

@@ -109,4 +109,10 @@ class MainViewModel @Inject constructor(
         return priceWithoutDollarSign.toDoubleOrNull() ?: 0.0
     }
 
+    fun refreshData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val casesFromDb = caseDB.caseDao().getAllCasesList()
+            date.postValue(casesFromDb.toMutableList())
+        }
+    }
 }

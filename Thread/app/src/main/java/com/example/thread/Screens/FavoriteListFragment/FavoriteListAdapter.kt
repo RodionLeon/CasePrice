@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.thread.Consts
 import com.example.thread.Model.Case
 import com.example.thread.R
-import com.example.thread.databinding.ItemRvBinding
 import javax.inject.Inject
 
 class FavoriteListAdapter @Inject constructor() : RecyclerView.Adapter<FavoriteListAdapter.FavoriteViewHolder>() {
@@ -25,7 +24,7 @@ class FavoriteListAdapter @Inject constructor() : RecyclerView.Adapter<FavoriteL
         val difImgSell = itemView.findViewById<ImageView>(R.id.sellImg)
         val isFavoriteImg = itemView.findViewById<ImageView>(R.id.isFavorite)
 
-        init {
+       init {
             itemView.setOnLongClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {

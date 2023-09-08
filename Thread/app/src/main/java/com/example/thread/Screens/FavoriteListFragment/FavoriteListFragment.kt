@@ -44,7 +44,7 @@ class FavoriteListFragment : Fragment() {
 
         adapter.removeFavoriteItemClickListener = { position ->
             val favoriteCase = adapter.favoriteCaseList[position]
-            viewModel.viewModelScope.launch { viewModel.removeFromFavorites(favoriteCase.name) }
+            viewModel.viewModelScope.launch { viewModel.removeFromFavorites(favoriteCase.name)      }
         }
 
         return view
